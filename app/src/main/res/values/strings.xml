@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">myunic</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="bpmLabel">BPM:%1$d</string>
+    <string name="StartHeartRateScanButtonLabel">start heart rate</string>
     <string name="action_settings">Settings</string>
 </resources>

@@ -4,14 +4,49 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 
 public class MainActivity extends Activity {
+
+    HeartRateScanCamera mHeartRateScanCamera;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        TextView bpmLable = (TextView) findViewById(R.id.bpmLabelText);
+        bpmLable.setText(getString(R.string.bpmLabel, 0));
+
+        Button heartScanButton = (Button) findViewById(R.id.HeartRateButton);
+        heartScanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mHeartRateScanCamera.scanStart();
+            }
+        });
+
+        mHeartRateScanCamera = new HeartRateScanCamera(this);
+        mHeartRateScanCamera.setScanCallback(new HeartRateScanCamera.HeartScanCallback() {
+            @Override
+            public void onBeat(int bpm, long beatSpan) {
+                TextView bpmLable = (TextView) findViewById(R.id.bpmLabelText);
+                bpmLable.setText(getString(R.string.bpmLabel, bpm));
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mHeartRateScanCamera.releaseCamera();
     }
 
     @Override
