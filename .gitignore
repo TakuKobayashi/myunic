@@ -35,3 +35,6 @@ build/
 captures/
 
 app/src/main/java/tokyo/day/hack/music/com/myunic/Config.java
+app/src/main/java/live2d/
+app/src/main/assets/live2d/
+app/libs/live2d_android.jar
