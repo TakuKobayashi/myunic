@@ -34,3 +34,4 @@ app/build/
 build/
 captures/
 
+app/src/main/java/tokyo/day/hack/music/com/myunic/Config.java
