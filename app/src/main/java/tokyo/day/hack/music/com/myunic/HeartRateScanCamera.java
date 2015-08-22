@@ -8,6 +8,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
+import java.util.ArrayList;
+
 /**
  * Created by akizuki on 2015/07/05.
  */
@@ -26,9 +28,12 @@ public class HeartRateScanCamera {
     private int beatCounter = 0;
     //前回とのビートの時でBPがなんとなく出そう
     private long prevBeatSpan = 0;
+    private int mSumLoopBeatCount;
+    private ArrayList<Integer> bpmList;
 
     public HeartRateScanCamera(Activity act){
         mActivity = act;
+        bpmList = new ArrayList<Integer>();
     }
 
     public void setScanCallback(HeartScanCallback callback){
@@ -71,13 +76,14 @@ public class HeartRateScanCamera {
                     prevSampling = 0;
                     beatCounter = 0;
                     prevBeatSpan = System.currentTimeMillis();
+                    mSumLoopBeatCount = 0;
+                    bpmList.clear();
                     return;
                 }
                 if (prevSampling == 0) {
                     prevSampling = lightFieldCount;
                     prevBeatSpan = System.currentTimeMillis();
                 } else {
-                    Log.d("spasibo", "a:" + mPreviewSize.width * mPreviewSize.height + " l:" + lightFieldCount + " p:" + prevSampling + " b:" + beatCounter);
                     if (prevSampling < lightFieldCount) {
                         ++beatCounter;
                         if (beatCounter > 1) beatCounter = 1;
@@ -86,11 +92,19 @@ public class HeartRateScanCamera {
                         if (beatCounter < -1) beatCounter = -1;
                     }
                     if (beatCounter == 0) {
-                        long span = System.currentTimeMillis() - prevBeatSpan;
-                        int bpm = (int) ((float) 1 * 1000 * 60 / span);
-                        prevBeatSpan = System.currentTimeMillis();
-                        if(mCallback != null) mCallback.onBeat(bpm, span);
-                        Log.d("spasibo", "bpm:" + bpm + " span:" + span);
+                        ++mSumLoopBeatCount;
+                        if(mSumLoopBeatCount % 2 == 0){
+                            long span = System.currentTimeMillis() - prevBeatSpan;
+                            int bpm = (int) ((float) 1 * 1000 * 60 / span);
+                            prevBeatSpan = System.currentTimeMillis();
+                            bpmList.add(bpm);
+                            int sum = 0;
+                            for(int i = 0;i < bpmList.size();++i) {
+                                sum += bpmList.get(i);
+                            }
+                            if(mCallback != null) mCallback.onBeat(sum / bpmList.size(), span);
+                        }
+
                     }
                     prevSampling = lightFieldCount;
                 }
